@@ -18,7 +18,7 @@ sequelize.authenticate()
     .then(() => {
         console.log('Connection has been established successfully.');
         // Sync all models at once
-        return sequelize.sync({ /*force: true*/ });
+        return sequelize.sync();
     })
     .then(() => {
         console.log('Database synchronized');

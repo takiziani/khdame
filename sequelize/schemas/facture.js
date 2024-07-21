@@ -11,10 +11,6 @@ const Facture = sequelize.define('Facture', {
         type: DataTypes.FLOAT,
         allowNull: false,
     },
-    date: {
-        type: DataTypes.DATE,
-        allowNull: false,
-    },
     profit: {
         type: DataTypes.FLOAT,
         allowNull: false,
@@ -24,8 +20,8 @@ const Facture = sequelize.define('Facture', {
         allowNull: false,
     },
     listofproducts: {
-        type: DataTypes.JSON,
+        type: DataTypes.ARRAY(DataTypes.JSON),
         allowNull: false,
     }
-}, { timestamps: false, });
+}, { timestamps: true, createdAt: 'created_at', updatedAt: false });
 export default Facture;

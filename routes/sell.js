@@ -21,14 +21,12 @@ router.post("/sell/checkout", async (request, response) => {
     const productsid = request.body.productsid;
     const productsquantity = request.body.productsquantity;
     const userid = request.userid;
-    let object = [];
     const facture = await Facture.create({
         Userid: userid,
         total: 0,
         profit: 0,
         capital: 0,
-        date: new Date(),
-        listofproducts: { list: [object] }
+        listofproducts: []
     });
     for (let i = 0; i < productsid.length; i++) {
         const product = await Product.findOne({
@@ -46,12 +44,11 @@ router.post("/sell/checkout", async (request, response) => {
         facture.total += product.price_sell * productsquantity[i];
         facture.profit += (product.price_sell - product.price_bought) * productsquantity[i];
         facture.capital += product.price_bought * productsquantity[i];
-        object.push({ productname: product.name, quantity: productsquantity[i], price: product.price_sell });
+        facture.listofproducts.push({ productname: product.name, quantity: productsquantity[i], price: product.price_sell });
         product.stock -= productsquantity[i];
         await product.save();
+        await facture.save();
     }
-    facture.listofproducts = { list: object };
-    await facture.save();
     response.json(facture);
 });
 router.get("/sell/search", async (request, response) => {
