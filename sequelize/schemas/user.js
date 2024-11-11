@@ -36,6 +36,13 @@ const User = sequelize.define('User', {
 },
     {
         timestamps: false,
+        hooks: {
+            beforeSave: (user) => {
+                if (user.email) {
+                    user.email = user.email.toLowerCase();
+                }
+            }
+        }
     }
 );
 
