@@ -68,22 +68,22 @@ router.post("/users/login", async (request, response) => {
     }
 });
 router.get("/users/refresh", async (request, response) => {
-    const refreshToken = request.cookies.refreshToken;
-    if (!refreshToken) {
-        return response.status(401).json({ error: "Refresh token not found" });
-    }
-    let payload;
     try {
+        const refreshToken = request.cookies.refreshToken;
+        if (!refreshToken) {
+            return response.status(401).json({ error: "Refresh token not found" });
+        }
+        let payload;
         payload = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+        const user = await User.findOne({ where: { username: payload.username } });
+        if (!user || user.refresh_token !== refreshToken) {
+            return response.status(401).json({ error: "Invalid refresh token" });
+        }
+        const accessToken = jwt.sign({ username: user.username }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "1h" });
+        response.json({ accessToken });
     } catch (error) {
-        return response.status(401).json({ error: "Invalid refresh token" });
+        return response.status(401).json({ error: error.message });
     }
-    const user = await User.findOne({ where: { username: payload.username } });
-    if (!user || user.refresh_token !== refreshToken) {
-        return response.status(401).json({ error: "Invalid refresh token" });
-    }
-    const accessToken = jwt.sign({ username: user.username }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "1h" });
-    response.json({ accessToken });
 });
 router.get("/users/check", verifyjwt, async (request, response) => {
     response.json({ message: "User is logged in" });
