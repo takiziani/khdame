@@ -19,8 +19,8 @@ router.post("/users/register", async (request, response) => {
     }
 });
 router.delete("/users/delete", verifyjwt, async (request, response) => {
-    const id = request.user.id;
     try {
+        const id = request.userid;
         await User.destroy({ where: { id_user: id } });
         response.json({ message: `User with id ${id} has been deleted` });
     } catch (error) {
