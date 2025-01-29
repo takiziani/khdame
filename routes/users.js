@@ -48,8 +48,8 @@ router.post("/users/login", async (request, response) => {
             return response.status(400).json({ error: "Invalid password" });
         }
 
-        const accessToken = jwt.sign({ "id": user.id_user, "role": user.role }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "1h" });
-        const refreshToken = jwt.sign({ "id": user.id_user, "role": user.role }, process.env.REFRESH_TOKEN_SECRET, { expiresIn: "7d" });
+        const accessToken = jwt.sign({ "id": user.id_user }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: "1h" });
+        const refreshToken = jwt.sign({ "id": user.id_user }, process.env.REFRESH_TOKEN_SECRET, { expiresIn: "7d" });
         user.refresh_token = refreshToken;
         await user.save();
         response.cookie('refreshToken', refreshToken, {
@@ -60,7 +60,7 @@ router.post("/users/login", async (request, response) => {
         });
         // Send the access token to the client
         response.json({
-            user: user.name,
+            user: user.username,
             accessToken
         });
     } catch (error) {
@@ -75,7 +75,7 @@ router.get("/users/refresh", async (request, response) => {
         }
         let payload;
         payload = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
-        const user = await User.findOne({ where: { username: payload.username } });
+        const user = await User.findOne({ where: { id_user: payload.id } });
         if (!user || user.refresh_token !== refreshToken) {
             return response.status(401).json({ error: "Invalid refresh token" });
         }
@@ -89,20 +89,24 @@ router.get("/users/check", verifyjwt, async (request, response) => {
     response.json({ message: "User is logged in" });
 });
 router.post("/users/logout", verifyjwt, async (request, response) => {
-    const cookies = request.cookies;
-    const user = await User.findOne({ where: { refresh_token: cookies.refreshToken } });
-    if (!user) {
-        return response.status(401).json({ error: "User not found" });
+    try {
+        const cookies = request.cookies;
+        const user = await User.findOne({ where: { refresh_token: cookies.refreshToken } });
+        if (!user) {
+            return response.status(401).json({ error: "User not found" });
+        }
+        user.refreshToken = null;
+        await user.save();
+        response.clearCookie('refreshToken', {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'None',
+            maxAge: 7 * 24 * 60 * 60 * 1000
+        });
+        response.json({ message: "Logged out" });
+    } catch (error) {
+        response.status(400).json({ error: error.message });
     }
-    user.refreshToken = null;
-    await user.save();
-    response.clearCookie('refreshToken', {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'None',
-        maxAge: 7 * 24 * 60 * 60 * 1000
-    });
-    response.json({ message: "Logged out" });
 });
 router.patch("/users/update", verifyjwt, async (request, response) => {
     const id = request.user.id;
