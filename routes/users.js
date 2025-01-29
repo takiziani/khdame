@@ -88,7 +88,7 @@ router.get("/users/refresh", async (request, response) => {
 router.get("/users/check", verifyjwt, async (request, response) => {
     try {
         const userid = request.userid;
-        const user = await User.findOne({ where: { id_user: userid } });
+        const user = await User.findOne({ where: { id_user: userid }, attributes: { exclude: ['password', 'refresh_token'] } });
         response.json({ userinfo: user, message: "User is logged in" });
     } catch (error) {
         response.status(400).json({ error: error.message });
