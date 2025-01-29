@@ -14,7 +14,8 @@ const Product = sequelize.define('Product', {
     barcode: {
         type: DataTypes.INTEGER,
         allowNull: true,
-        defaultValue: 0,
+        defaultValue: null,
+        unique: true,
     },
     price_sell: {
         type: DataTypes.DECIMAL(10, 2),

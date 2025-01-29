@@ -127,10 +127,10 @@ router.patch("/users/update", verifyjwt, async (request, response) => {
                 userprevious.email = user.email;
             }
             if (user.username) {
-                userprevious.username
+                userprevious.username = user.username;
             }
             if (user.storename) {
-                userprevious.storename = user.store
+                userprevious.storename = user.storename;
             }
         }
         await userprevious.save();
