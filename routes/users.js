@@ -118,7 +118,10 @@ router.patch("/users/update", verifyjwt, async (request, response) => {
     try {
         const id = request.userid;
         const user = request.body;
-        const userprevious = await User.findOne({ where: { id_user: id } });
+        const userprevious = await User.findOne({
+            where: { id_user: id },
+            attributes: { exclude: ['password', 'refresh_token'] }
+        });
         if (userprevious) {
             if (user.email) {
                 userprevious.email = user.email;
@@ -132,6 +135,25 @@ router.patch("/users/update", verifyjwt, async (request, response) => {
         }
         await userprevious.save();
         response.json({ message: "User updated", user: userprevious });
+    } catch (error) {
+        response.status(400).json({ error: error.message });
+    }
+});
+router.patch("/users/updatepassword", verifyjwt, async (request, response) => {
+    try {
+        const id = request.userid;
+        const { password, newpassword } = request.body;
+        const user = await User.findOne({ where: { id_user: id } });
+        if (!user) {
+            return response.status(404).json({ error: "User not found" });
+        }
+        const isPasswordValid = comparePassword(password, user.password);
+        if (!isPasswordValid) {
+            return response.status(400).json({ error: "Invalid password" });
+        }
+        user.password = hashPassword(newpassword);
+        await user.save();
+        response.json({ message: "Password updated" });
     } catch (error) {
         response.status(400).json({ error: error.message });
     }
