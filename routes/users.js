@@ -86,9 +86,13 @@ router.get("/users/refresh", async (request, response) => {
     }
 });
 router.get("/users/check", verifyjwt, async (request, response) => {
-    const userid = request.userid;
-    const user = await User.findOne({ where: { id_user: userid } });
-    response.json({ userinfo: user, message: "User is logged in" });
+    try {
+        const userid = request.userid;
+        const user = await User.findOne({ where: { id_user: userid } });
+        response.json({ userinfo: user, message: "User is logged in" });
+    } catch (error) {
+        response.status(400).json({ error: error.message });
+    }
 });
 router.post("/users/logout", verifyjwt, async (request, response) => {
     try {
