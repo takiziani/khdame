@@ -86,7 +86,9 @@ router.get("/users/refresh", async (request, response) => {
     }
 });
 router.get("/users/check", verifyjwt, async (request, response) => {
-    response.json({ message: "User is logged in" });
+    const userid = request.userid;
+    const user = await User.findOne({ where: { id_user: userid } });
+    response.json({ userinfo: user, message: "User is logged in" });
 });
 router.post("/users/logout", verifyjwt, async (request, response) => {
     try {
@@ -109,10 +111,10 @@ router.post("/users/logout", verifyjwt, async (request, response) => {
     }
 });
 router.patch("/users/update", verifyjwt, async (request, response) => {
-    const id = request.user.id;
-    const user = request.body;
-    const userprevious = await User.findOne({ where: { id_user: id } });
     try {
+        const id = request.userid;
+        const user = request.body;
+        const userprevious = await User.findOne({ where: { id_user: id } });
         if (userprevious) {
             if (user.email) {
                 userprevious.email = user.email;
@@ -125,6 +127,7 @@ router.patch("/users/update", verifyjwt, async (request, response) => {
             }
         }
         await userprevious.save();
+        response.json({ message: "User updated", user: userprevious });
     } catch (error) {
         response.status(400).json({ error: error.message });
     }
