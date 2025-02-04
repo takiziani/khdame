@@ -2,7 +2,7 @@ import { DataTypes } from 'sequelize';
 import sequelize from '../config.js';
 const Product = sequelize.define('Product', {
     id_product: {
-        type: DataTypes.DOUBLE,
+        type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,
         allowNull: false

@@ -38,7 +38,6 @@ router.post("/users/login", async (request, response) => {
                 ]
             }
         });
-        console.log(user);
         if (!user) {
             return response.status(404).json({ error: "User not found" });
         }

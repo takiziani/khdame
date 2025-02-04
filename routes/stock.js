@@ -4,11 +4,12 @@ import verifyjwt from "../utils/jwt.js";
 const router = Router();
 router.use(verifyjwt);
 router.post("/stock/add", async (request, response) => {
-    const product = request.body;
-    product.Userid = request.userid;
-    console.log(request.userid);
     try {
+        const product = request.body;
+        product.Userid = request.userid;
+        console.log(request.userid);
         const newproduct = await Product.create(product);
+        console.log(newproduct);
         response.json(newproduct);
     } catch (error) {
         response.status(400).json({ error: error.message });
