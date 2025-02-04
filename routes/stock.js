@@ -69,4 +69,21 @@ router.patch("/stock/:id", async (request, response) => {
         response.status(400).json({ error: error.message });
     }
 });
+router.get("/stock/search", async (request, response) => {
+    try {
+        const query = request.query.product;
+        const userid = request.userid;
+        console.log(query);
+        const products = await Product.findAll({
+            where: {
+                Userid: userid,
+                name: { [Op.like]: `%${query}%` }
+            },
+            attributes: ['id_product', 'name', 'price_sell', 'price_bought', 'stock']
+        });
+        response.json(products);
+    } catch (error) {
+        response.status(400).json({ error: error.message });
+    }
+});
 export default router;

@@ -69,7 +69,7 @@ router.get("/sell/search", async (request, response) => {
                 Userid: userid,
                 name: { [Op.like]: `%${query}%` }
             },
-            attributes: ['id_product', 'name', 'price_sell']
+            attributes: ['id_product', 'name', 'price_sell', 'price_bought', 'stock']
         });
         response.json(products);
     } catch (error) {
@@ -77,39 +77,43 @@ router.get("/sell/search", async (request, response) => {
     }
 });
 router.post("/sell/client/checkout", async (request, response) => {
-    const total = request.body.total;
-    const profit = request.body.profit;
-    const capital = request.body.capital;
-    const listofproducts = request.body.listofproducts;
-    const userid = request.userid;
-    const facture = await Facture.create({
-        Userid: userid,
-        total: total,
-        profit: profit,
-        capital: capital,
-        listofproducts: listofproducts
-    });
-    for (let i = 0; i < productsid.length; i++) {
-        const product = await Product.findOne({
-            where: { id_product: productsid[i], Userid: userid },
-            attributes: ['id_product', 'name', 'stock', 'price_sell', 'price_bought']
+    try {
+        const total = request.body.total;
+        const profit = request.body.profit;
+        const capital = request.body.capital;
+        const listofproducts = request.body.listofproducts;
+        const userid = request.userid;
+        const facture = await Facture.create({
+            Userid: userid,
+            total: total,
+            profit: profit,
+            capital: capital,
+            listofproducts: listofproducts
         });
-        if (product === null) {
-            response.status(404).json({ error: "Product not found" });
-            return;
+        for (let i = 0; i < productsid.length; i++) {
+            const product = await Product.findOne({
+                where: { id_product: productsid[i], Userid: userid },
+                attributes: ['id_product', 'name', 'stock', 'price_sell', 'price_bought']
+            });
+            if (product === null) {
+                response.status(404).json({ error: "Product not found" });
+                return;
+            }
+            if (product.stock < productsquantity[i]) {
+                response.status(400).json({ error: "Not enough stock" });
+                return;
+            }
+            facture.total += product.price_sell * productsquantity[i];
+            facture.profit += (product.price_sell - product.price_bought) * productsquantity[i];
+            facture.capital += product.price_bought * productsquantity[i];
+            facture.listofproducts.push({ productname: product.name, quantity: productsquantity[i], price: product.price_sell });
+            product.stock -= productsquantity[i];
+            await product.save();
+            await facture.save();
         }
-        if (product.stock < productsquantity[i]) {
-            response.status(400).json({ error: "Not enough stock" });
-            return;
-        }
-        facture.total += product.price_sell * productsquantity[i];
-        facture.profit += (product.price_sell - product.price_bought) * productsquantity[i];
-        facture.capital += product.price_bought * productsquantity[i];
-        facture.listofproducts.push({ productname: product.name, quantity: productsquantity[i], price: product.price_sell });
-        product.stock -= productsquantity[i];
-        await product.save();
-        await facture.save();
+        response.json(facture);
+    } catch (error) {
+        response.status(400).json({ error: error.message });
     }
-    response.json(facture);
 });
 export default router;
