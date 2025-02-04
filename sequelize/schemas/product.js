@@ -12,7 +12,7 @@ const Product = sequelize.define('Product', {
         allowNull: false,
     },
     barcode: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.DOUBLE,
         allowNull: true,
         defaultValue: null,
         unique: true,
