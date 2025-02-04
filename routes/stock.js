@@ -23,8 +23,8 @@ router.get("/stock", async (request, response) => {
     }
 });
 router.get("/stock/:id", async (request, response) => {
-    const id = request.params.id;
     try {
+        const id = request.params.id;
         const product = await Product.findOne({ where: { id: id } });
         if (product === null) {
             response.status(404).json({ error: "Product not found" });
@@ -36,8 +36,8 @@ router.get("/stock/:id", async (request, response) => {
     }
 });
 router.delete("/stock/:id", async (request, response) => {
-    const id = request.params.id;
     try {
+        const id = request.params.id;
         const product = await Product.findOne({ where: { id: id } });
         if (product === null) {
             response.status(404).json({ error: "Product not found" });
@@ -50,11 +50,11 @@ router.delete("/stock/:id", async (request, response) => {
     }
 });
 router.patch("/stock/:id", async (request, response) => {
-    const id = request.params.id;
-    const product = request.body;
     try {
+        const id = request.params.id;
+        const product = request.body;
         const productToUpdate = await Product.findOne({ where: { id: id } });
-        if (productToUpdate === null) {
+        if (!productToUpdate) {
             response.status(404).json({ error: "Product not found" });
             return;
         }
