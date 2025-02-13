@@ -15,7 +15,6 @@ const Product = sequelize.define('Product', {
         type: DataTypes.DOUBLE,
         allowNull: true,
         defaultValue: null,
-        unique: true,
     },
     price_sell: {
         type: DataTypes.DECIMAL(10, 2),
