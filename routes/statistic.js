@@ -11,7 +11,9 @@ router.get("/statistic", async (request, response) => {
         const totalcapital = factures.reduce((acc, facture) => acc + facture.capital, 0);
         const total = totalcapital + totalprofit;
         const totalselles = factures.length;
-        response.json({ total, totalprofit, totalcapital, totalselles });
+        response.json({
+            factures, total, totalprofit, totalcapital, totalselles
+        });
     } catch (error) {
         response.status(400).json({ error: error.message });
     }
@@ -29,7 +31,7 @@ router.get("/statistic/:year", async (request, response) => {
         const totalcapital = yearfactures.reduce((acc, facture) => acc + facture.capital, 0);
         const total = totalcapital + totalprofit;
         const totalselles = yearfactures.length;
-        response.json({ yearfactures, total, totalprofit, totalcapital, totalselles });
+        response.json({ factures, total, totalprofit, totalcapital, totalselles });
     } catch (error) {
         response.status(400).json({ error: error.message });
     }
@@ -49,7 +51,7 @@ router.get("/statistic/:year/:month", async (request, response) => {
         const totalcapital = monthfactures.reduce((acc, facture) => acc + facture.capital, 0);
         const total = totalcapital + totalprofit;
         const totalselles = monthfactures.length;
-        response.json({ monthfactures, total, totalprofit, totalcapital, totalselles });
+        response.json({ factures, total, totalprofit, totalcapital, totalselles });
     } catch (error) {
         response.status(400).json({ error: error.message });
     }
@@ -70,7 +72,7 @@ router.get("/statistic/:year/:month/:day", async (request, response) => {
         const totalcapital = dayfactures.reduce((acc, facture) => acc + facture.capital, 0);
         const total = totalcapital + totalprofit;
         const totalselles = dayfactures.length;
-        response.json({ dayfactures, total, totalprofit, totalcapital, totalselles });
+        response.json({ factures, total, totalprofit, totalcapital, totalselles });
     } catch (error) {
         response.status(400).json({ error: error.message });
     }
@@ -95,7 +97,7 @@ router.get("/statistic_intervalle", async (request, response) => {
         const totalcapital = intervallefactures.reduce((acc, facture) => acc + facture.capital, 0);
         const total = totalcapital + totalprofit;
         const totalselles = intervallefactures.length;
-        response.json({ intervallefactures, total, totalprofit, totalcapital, totalselles });
+        response.json({ factures, total, totalprofit, totalcapital, totalselles });
     } catch (error) {
         response.status(400).json({ error: error.message });
     }

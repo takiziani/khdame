@@ -112,4 +112,18 @@ router.post("/sell/client/checkout", async (request, response) => {
         response.status(400).json({ error: error.message });
     }
 });
+// router.post("/generate/QrCode", async (request, response) => {
+//     try {
+//         const factureid = request.body.factureid;
+//         const facture = await Facture.findOne({ where: { id_facture: factureid } });
+//         if (facture === null) {
+//             response.status(404).json({ error: "Facture not found" });
+//             return;
+//         }
+//         const qrCode = await generateQrCode(facture);
+//         response.json({ qrCode: qrCode });
+//     } catch (error) {
+//         response.status(400).json({ error: error.message });
+//     }
+// });
 export default router;
