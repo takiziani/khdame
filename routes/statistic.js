@@ -83,7 +83,6 @@ router.get("/statistic_intervalle", async (request, response) => {
         const intervalle = request.body;
         const startDate = new Date(intervalle.start);
         const endDate = new Date(intervalle.end);
-        console.log(startDate, endDate);
         const factures = await Facture.findAll({ where: { Userid: userid } });
         const intervallefactures = factures.filter(facture => {
             const factureDate = new Date(facture.created_at);

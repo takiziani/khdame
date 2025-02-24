@@ -21,49 +21,48 @@ router.post("/sell", async (request, response) => {
         response.status(400).json({ error: error.message });
     }
 });
-router.post("/sell/server/checkout", async (request, response) => {
-    try {
-        const productsid = request.body.productsid;
-        const productsquantity = request.body.productsquantity;
-        const userid = request.userid;
-        const facture = await Facture.create({
-            Userid: userid,
-            total: 0,
-            profit: 0,
-            capital: 0,
-            listofproducts: []
-        });
-        for (let i = 0; i < productsid.length; i++) {
-            const product = await Product.findOne({
-                where: { id_product: productsid[i], Userid: userid },
-                attributes: ['id_product', 'name', 'stock', 'price_sell', 'price_bought']
-            });
-            if (product === null) {
-                response.status(404).json({ error: "Product not found" });
-                return;
-            }
-            if (product.stock < productsquantity[i]) {
-                response.status(400).json({ error: "Not enough stock" });
-                return;
-            }
-            facture.total += product.price_sell * productsquantity[i];
-            facture.profit += (product.price_sell - product.price_bought) * productsquantity[i];
-            facture.capital += product.price_bought * productsquantity[i];
-            facture.listofproducts.push({ productname: product.name, quantity: productsquantity[i], price: product.price_sell });
-            product.stock -= productsquantity[i];
-            await product.save();
-            await facture.save();
-        }
-        response.json(facture);
-    } catch (error) {
-        response.status(400).json({ error: error.message });
-    }
-});
+// router.post("/sell/server/checkout", async (request, response) => {
+//     try {
+//         const productsid = request.body.productsid;
+//         const productsquantity = request.body.productsquantity;
+//         const userid = request.userid;
+//         const facture = await Facture.create({
+//             Userid: userid,
+//             total: 0,
+//             profit: 0,
+//             capital: 0,
+//             listofproducts: []
+//         });
+//         for (let i = 0; i < productsid.length; i++) {
+//             const product = await Product.findOne({
+//                 where: { id_product: productsid[i], Userid: userid },
+//                 attributes: ['id_product', 'name', 'stock', 'price_sell', 'price_bought']
+//             });
+//             if (product === null) {
+//                 response.status(404).json({ error: "Product not found" });
+//                 return;
+//             }
+//             if (product.stock < productsquantity[i]) {
+//                 response.status(400).json({ error: "Not enough stock" });
+//                 return;
+//             }
+//             facture.total += product.price_sell * productsquantity[i];
+//             facture.profit += (product.price_sell - product.price_bought) * productsquantity[i];
+//             facture.capital += product.price_bought * productsquantity[i];
+//             facture.listofproducts.push({ productname: product.name, quantity: productsquantity[i], price: product.price_sell });
+//             product.stock -= productsquantity[i];
+//             await product.save();
+//             await facture.save();
+//         }
+//         response.json(facture);
+//     } catch (error) {
+//         response.status(400).json({ error: error.message });
+//     }
+// });
 router.get("/sell/search", async (request, response) => {
     try {
         const query = request.query.product;
         const userid = request.userid;
-        console.log(query);
         const products = await Product.findAll({
             where: {
                 Userid: userid,

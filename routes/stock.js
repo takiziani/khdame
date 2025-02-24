@@ -7,9 +7,7 @@ router.post("/stock/add", async (request, response) => {
     try {
         const product = request.body;
         product.Userid = request.userid;
-        console.log(request.userid);
         const newproduct = await Product.create(product);
-        console.log(newproduct);
         response.json(newproduct);
     } catch (error) {
         response.status(400).json({ error: error.message });
@@ -73,7 +71,6 @@ router.get("/stock/search", async (request, response) => {
     try {
         const query = request.query.product;
         const userid = request.userid;
-        console.log(query);
         const products = await Product.findAll({
             where: {
                 Userid: userid,

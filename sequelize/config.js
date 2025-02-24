@@ -7,6 +7,7 @@ const sequelize = new Sequelize(process.env.DATABASE_URL, {
             require: true,
             rejectUnauthorized: false // This line will fix potential certificate issues
         }
-    }
+    },
+    logging: false
 });
 export default sequelize;
